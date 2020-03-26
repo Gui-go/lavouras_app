@@ -9,24 +9,27 @@ ui <- fluidPage(
     titlePanel("Análise das lavouras"),
     hr(),
     
-    sidebarLayout(
-        sidebarPanel(
-            # setSliderColor()
+    column(
+        width = 3,
+        fluidPage(
             uiOutput(outputId = "input_ui1"),
             uiOutput(outputId = "input_ui2"),
             uiOutput(outputId = "input_ui3"),
             uiOutput(outputId = "input_ui4"),
             uiOutput(outputId = "input_ui5"),
             uiOutput(outputId = "input_ui6")
-        ),
-        
-        mainPanel(
+        )
+    ),
+    
+    column(
+        width = 9,
+        fluidPage(
             tabsetPanel(selected = "tab2",
-                tabPanel("tab1",
-                         plotOutput(outputId = "plot1")
-                ),
-                tabPanel("tab2",
-                         tableOutput(outputId = "table1"))
+                        tabPanel("tab1",
+                                 plotOutput(outputId = "plot1")
+                        ),
+                        tabPanel("tab2",
+                                 tableOutput(outputId = "table1"))
             )
         )
     )
@@ -61,7 +64,12 @@ server <- function(input, output) {
             label = "uf", 
             choices = var_input2, 
             selected = var_input2[1], 
-            multiple = T
+            multiple = T,
+            options = shinyWidgets::pickerOptions(
+                actionsBox = T,
+                deselectAllText = "Nenhum", 
+                selectAllText = "Todos"
+            )
         )
     })
     
@@ -115,11 +123,14 @@ server <- function(input, output) {
     
     
     output$plot1 <- renderPlot({
-        x    <- faithful[, 2]
-        # bins <- seq(min(x), max(x), length.out = input$bins + 1)
-        bins = 30
+        a <- lavouras %>% filter(Nomes_prod %in% input$input_server1, uf %in% input$input_server2, Meso %in% input$input_server3, Micro %in% input$input_server4, Tipo_lav %in% input$input_server5, Gr_areatotal %in% input$input_server6) %>% select(Areat) %>% pull()
         
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+        hist(a)
+        # ggplot(lavouras, aes(x=lavouras$Volume)) + 
+        #     geom_histogram(aes(y=..density..),
+        #                    binwidth=.5,
+        #                    colour="black", fill="white") +
+        #     geom_density(alpha=.2, fill="#FF6666")
     })
     
     output$table1 <- renderTable(
