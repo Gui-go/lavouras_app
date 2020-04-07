@@ -1,51 +1,122 @@
-#shinyApp()
-#install.packages("rsconnect")
 library(rsconnect)
 library(shiny)
 library(shinyWidgets)
 library(ggplot2)
 library(dplyr)
+library(shinydashboard)
 
 #https://www.curso-r.com/material/shiny/
 # setwd('C:/Users/Arlei/OneDrive/Arlei-Carliton-Dimitri/SHYNI')  
 
-ui <- fluidPage(
-    
-    titlePanel("Análise das lavouras do CENSO Agropecuário 2017"),
-    hr(),
-    
-    fluidRow(
-        column(width = 2,
-               br(),
-               uiOutput(outputId = "input_ui1"),
-               uiOutput(outputId = "input_ui2"),
-               uiOutput(outputId = "input_ui3"),
-               uiOutput(outputId = "input_ui4"),
-               uiOutput(outputId = "input_ui5"),
-               uiOutput(outputId = "input_ui6"),
-               uiOutput(outputId = "input_ui7")
-        ),
+ui <- dashboardPage(
+    title = "Aplicação das lavouras", 
+    skin = "blue",
+    header = dashboardHeader(
+        title = "Cabeçalho", 
+        titleWidth = 300, 
+        disable = F
+    ), 
+    sidebar = dashboardSidebar(
+        disable = F, 
+        width = 300, 
+        collapsed = F,
         
-        column(width = 10,
-            tabsetPanel(selected = "Tab 1",
-                        tabPanel("Tab1",
-                                 tableOutput(outputId = "table1")),
-                        tabPanel("Graf. Densidade Nacional",
-                                 plotOutput(outputId = "plot1")),                  
-                        tabPanel("Graf. Densidade Estadual",
-                                 plotOutput(outputId = "plot2")),
-                        tabPanel("Graf. Boxplot Mesoregional",
-                                 plotOutput(outputId = "plot3")),
-                        tabPanel("Graf. Dispersao",
-                                 plotOutput(outputId = "plot4")),
-                        tabPanel("Graf. Boxplot por grupo de area",
-                                 plotOutput(outputId = "plot5")
+        sidebarMenu(
+            menuItem(
+                text = "Início", 
+                icon = icon("asterisk"), 
+                badgeLabel = "novo", 
+                badgeColor = "green", 
+                tabName = "menu1", 
+                selected = T
+            ),
+            menuItem(
+                text = "Aba2", 
+                icon = icon("gear"), 
+                badgeLabel = "dica", 
+                badgeColor = "red", 
+                tabName = "menu2", 
+                selected = F
+            ),
+            menuItem(
+                text = "Sobre", 
+                tabName = "menu3", 
+                selected = F,
+                
+                menuSubItem(
+                    text = "Sub Item um", 
+                    tabName = "submenu1"
+                ),
+                menuSubItem(
+                    text = "Sub Item dois", 
+                    tabName = "submenu2"
+                )
+            )
+        )
+    ), 
+    body =  dashboardBody(
+        tabItems(
+            tabItem(
+                tabName = "menu1",
+                fluidPage(
+                    fluidRow(
+                        column(width = 2,
+                               br(),
+                               uiOutput(outputId = "input_ui1"),
+                               uiOutput(outputId = "input_ui2"),
+                               uiOutput(outputId = "input_ui3"),
+                               uiOutput(outputId = "input_ui4"),
+                               uiOutput(outputId = "input_ui5"),
+                               uiOutput(outputId = "input_ui6"),
+                               uiOutput(outputId = "input_ui7")
+                        ),
+                        
+                        column(width = 10,
+                               tabsetPanel(selected = "Tab 1", 
+                                           tabPanel("Tab1",
+                                                    tableOutput(outputId = "table1")),
+                                           tabPanel("Graf. Densidade Nacional",
+                                                    plotOutput(outputId = "plot1",height="800px")),                  
+                                           tabPanel("Graf. Densidade Estadual",
+                                                    plotOutput(outputId = "plot2")),
+                                           tabPanel("Graf. Boxplot Mesoregional",
+                                                    plotOutput(outputId = "plot3")),
+                                           tabPanel("Graf. Dispersao",
+                                                    plotOutput(outputId = "plot4")),
+                                           tabPanel("Graf. Boxplot por grupo de area",
+                                                    plotOutput(outputId = "plot5")
+                                           )
+                               )
                         )
+                    )
+                    
+                )
+            ),
+            tabItem(
+                tabName = "menu2",
+                fluidPage(
+                    h3("Abas são muito úteis pra que possamos dividir vizualizações em abas diferentes. Quando cada uma das vizualizações possui muitos detalhes, variáveis e inputs diferentes uns dos outros, acaba ficando um pouco confuso. Possível, mas confuso. Então, ao concentrar vizualizações semelhantes na mesma aba, tudo se torna mais simples e intuitivo."),
+                    br(),
+                    h3("Pra aproveitar melhor o espaço da tela, basta utilizar o argumento height dentro da função plotOutput, ou seja qual for o output desejável. No caso do plot2, por exemplo, utilizei height='800px'. Infelizmente, não é possível definir como 100%, ou alguma medida relativa. Sendo assim, é possível que a Dashboard tenha aparencia diferente em tamanhos de tela distintos..."),
+                    br(),
+                    h3("Além disso, me parece mais agradável aos olhos utilizar theme_minimal ou theme_classic nos gráficos. Mas isso, claro, é apenas questão de gosto.")
+                )
+            ),
+            tabItem(
+                tabName = "submenu1",
+                h1("Subitem1...")
+            ),
+            tabItem(
+                tabName = "submenu2",
+                h3("submenu2")
             )
         )
     )
-    
 )
+
+
+
+
 
 server <- function(input, output) {
     
