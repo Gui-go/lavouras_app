@@ -39,6 +39,10 @@ ui <- dashboardPage(
                 selected = F
             ),
             menuItem(
+                text = "Disperão em violino", 
+                tabName = "menuVS"
+            ),
+            menuItem(
                 text = "Sobre", 
                 tabName = "menu3", 
                 selected = F,
@@ -76,7 +80,7 @@ ui <- dashboardPage(
                                            tabPanel("Tab1",
                                                     tableOutput(outputId = "table1")),
                                            tabPanel("Graf. Densidade Nacional",
-                                                    plotOutput(outputId = "plot1",height="800px")),                  
+                                                    plotOutput(outputId = "plot1",height="700px")),                  
                                            tabPanel("Graf. Densidade Estadual",
                                                     plotOutput(outputId = "plot2")),
                                            tabPanel("Graf. Boxplot Mesoregional",
@@ -91,6 +95,10 @@ ui <- dashboardPage(
                     )
                     
                 )
+            ),
+            tabItem(
+                tabName = "menuVS",
+                plotOutput(outputId = "plotVS", width = "1500px", height = "740px")
             ),
             tabItem(
                 tabName = "menu2",
@@ -230,23 +238,24 @@ server <- function(input, output) {
     output$plot1 <- renderPlot({
         lavouras %>% filter(Nomes_prod1 %in% input$input_server2, Rendm > 0 ) %>% select(Rendm) %>%    
             ggplot() +  geom_density (aes(Rendm)) + 
-            ggtitle('Rendimento Nacional da lavoura selecionada') 
-        
+            ggtitle('Rendimento Nacional da lavoura selecionada') +
+            theme_dark()
     })
     
     output$plot2 <- renderPlot({
         var1 <- lavouras %>% filter(Nomes_prod1 %in% input$input_server2, UF1 %in% input$input_server3, Rendm > 0 ) %>% select(UF1, Rendm)    
         var2 <- lavouras %>% filter(Nomes_prod1 %in% input$input_server2, Rendm > 0 ) %>% select(Rendm)    
         ggplot() +  geom_density (aes(var1$Rendm)) + geom_density (aes(var2$Rendm)) +
-            ggtitle('Rendimento do da lavouras em cada estado') #+
-            # facet_wrap(~input$input_server3)
+            ggtitle('Rendimento do da lavouras em cada estado') +
+            theme_classic()
     })
     
     output$plot3 <- renderPlot({
         lavouras %>% filter(Nomes_prod1 %in% input$input_server2, UF1 %in% input$input_server3, Rendm > 0 ) %>% select(Nome_Meso, Rendm) %>%    
             ggplot() + geom_boxplot(aes(x = input$input_server3, y = Rendm)) +
             ggtitle('Rendimento do PRODUTO nas Meso regioes selecionada')  +
-            facet_wrap(~ Nome_Meso)
+            facet_wrap(~ Nome_Meso)+
+            theme_void()
         
     })
     output$plot4 <- renderPlot({
@@ -262,6 +271,11 @@ server <- function(input, output) {
             ggtitle('Comportamento da produtivida por tamanho da propriedade  nos Estados selecionados') +
             scale_x_discrete(limits = c("ha0_10","ha10_20", "ha20_50", "ha50_100", "ha200_500", "ha500_1000", "ha1000_mais", "Total"))
     })    
+    output$plotVS <- renderPlot({
+        ggplot(mtcars, aes(mpg, factor(cyl))) +
+            geom_violin()+
+            theme_classic()
+    })
     
     
 }
